@@ -1,6 +1,7 @@
 const http = require('http')
 const url = require('url')
 const fs = require('fs')
+const replaceTemplate = require(`${__dirname}/modules/replaceTemplate.js`)
 
 
 
@@ -20,32 +21,22 @@ const dbObject = JSON.parse(jsonDataFileContents)
 const templateOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8')
 const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8')
 const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8')
-const replaceTemplate = (template, product) => {
-    let output = template.replace(/{%PRODUCTNAME%}/g, product.productName)
-    output = output.replace(/{%IMAGE%}/g, product.image)
-    output = output.replace(/{%PRICE%}/g, product.price)
-    output = output.replace(/{%FROM%}/g, product.from)
-    output = output.replace(/{%PRODOCTVITAMINS%}/g, product.nutrients)
-    output = output.replace(/{%QUANTITY%}/g, product.quantity)
-    output = output.replace(/{%DESCRIPTION%}/g, product.description)
-    output = output.replace(/{%ID%}/g, product.id)
-
-    if (!product.organic) {
-        output = output.replace(/{%NOTORGANIC%}/g, 'not-organic')
-    }
-
-    return output
-}
-
 
 
 
 // This is going to be a simple http server
 const server = http.createServer((req, res) => {
-    const pathName = req.url;
     
     
-    if (pathName === '/' || pathName === '/overview') {
+    const {query, pathname} = url.parse(req.url, true)
+    //console.log(queryObj.query.name)
+    
+
+
+    
+    
+    
+    if (pathname === '/' || pathname === '/overview') {
         //Overview page
         /*
         console.log('responding with the db json file as a string (json header type)')
@@ -70,11 +61,11 @@ const server = http.createServer((req, res) => {
         
         
 
-        console.log('responding with overview page template')
+        
         res.writeHead(200, {
             'Content-type': 'text/html'
         })
-        console.log(finalOverviewPage)
+        
         res.end(finalOverviewPage)
         
 
@@ -83,15 +74,15 @@ const server = http.createServer((req, res) => {
 
 
 
-    } else if (pathName === '/product') {
+    } else if (pathname === '/product') {
         //Product page
-        res.end('This is the product')
+        const product = dbObject[query.id]
+        var output = replaceTemplate(templateProduct, product)
+        
+        res.end(output)
 
 
-
-
-
-    } else if (pathName === '/api') {
+    } else if (pathname === '/api') {
         //API
         const productData = JSON.parse(jsonDataFileContents)
         res.writeHead(200, {

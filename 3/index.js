@@ -1,6 +1,9 @@
 const http = require('http')
 const url = require('url')
 const fs = require('fs')
+
+const slugify = require('slugify');
+
 const replaceTemplate = require(`${__dirname}/modules/replaceTemplate.js`)
 
 
@@ -23,6 +26,10 @@ const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`
 const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8')
 
 
+const slugs = dbObject.map((el => slugify(el.productName, {
+    lower:true
+})));
+console.log(slugs)
 
 // This is going to be a simple http server
 const server = http.createServer((req, res) => {

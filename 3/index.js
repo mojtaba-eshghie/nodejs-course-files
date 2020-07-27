@@ -29,7 +29,8 @@ const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product
 const slugs = dbObject.map((el => slugify(el.productName, {
     lower:true
 })));
-console.log(slugs)
+
+// TODO: FIXME: 
 
 // This is going to be a simple http server
 const server = http.createServer((req, res) => {
